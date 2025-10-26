@@ -203,4 +203,47 @@ export class RawgService {
       );
     }
   }
+
+  async getCreators(id: number, page_size: number = 40) {
+    try {
+      const response = await firstValueFrom(
+        this.httpService.get(`${this.baseUrl}/games/${id}/development-team`, {
+          params: {
+            key: this.apiKey,
+            page_size: page_size,
+          },
+        }),
+      );
+      const creators = response.data;
+
+      const count = creators.count;
+      const pages = Math.ceil(count / page_size);
+      const promises = [];
+      for (let i = 2; i <= pages; i++) {
+        promises.push(
+          firstValueFrom(
+            this.httpService.get(`${this.baseUrl}/games/${id}/development-team`, {
+              params: { key: this.apiKey, page: i, page_size: page_size },
+            }),
+          ),
+        );
+      }
+      const otherCreators = (await Promise.all(promises)).flatMap(
+        (creator: any) => creator.data.results,
+      );
+      const creatorsData = creators.results.concat(otherCreators).map((creator: any) => ({
+        ...creator,
+        game_id: id,
+        positions: creator?.positions?.map((result: any) => result.name) || [],
+        image_background: creator?.image || '',
+      }));
+      return creatorsData;
+    } catch (error) {
+      console.error('Failed to fetch creators from RAWG API', error);
+      throw new HttpException(
+        'Failed to fetch creators from RAWG API',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }

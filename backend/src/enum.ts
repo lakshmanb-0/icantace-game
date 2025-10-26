@@ -5,4 +5,5 @@ export enum SchemaType {
   DEVELOPER = 'developer',
   PUBLISHER = 'publisher',
   ESRB_RATING = 'esrb_rating',
+  CREATOR = 'creator',
 }

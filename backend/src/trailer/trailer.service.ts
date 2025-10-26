@@ -1,13 +1,16 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import { ClientSession, Connection, Model } from 'mongoose';
 import { Trailer, TrailerDocument } from './trailer.schema';
 
 @Injectable()
 export class TrailerService {
-  constructor(@InjectModel(Trailer.name) private readonly trailerModel: Model<TrailerDocument>) {}
+  constructor(
+    @InjectModel(Trailer.name) private readonly trailerModel: Model<TrailerDocument>,
+    @InjectConnection() private readonly connection: Connection,
+  ) {}
 
-  async upsertMany(trailers: any[]): Promise<any> {
+  async upsertMany(trailers: any[], session: ClientSession): Promise<any> {
     await this.trailerModel.bulkWrite(
       trailers.map((trailer: any) => ({
         updateOne: {
@@ -16,12 +19,14 @@ export class TrailerService {
           upsert: true,
         },
       })),
+      { session },
     );
 
     const updatedDocs = await this.trailerModel
       .find({
         id: { $in: trailers.map((trailer: any) => trailer.id) },
       })
+      .session(session)
       .lean();
 
     return updatedDocs.map(doc => ({

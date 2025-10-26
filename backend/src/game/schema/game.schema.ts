@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document } from 'mongoose';
+import mongoose, { Document, Model } from 'mongoose';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Achievement } from 'src/achievement/achievement.schema';
 import { EntityBase } from 'src/entity-base/entity-base.schema';
@@ -55,13 +55,6 @@ export class Game extends Document {
   @Prop()
   released?: string;
 
-  @ApiPropertyOptional({ description: 'To be announced flag', example: false, default: false })
-  @Prop({ default: false })
-  tba: boolean;
-
-  @ApiPropertyOptional({ description: 'Last update date', example: '2023-04-16T07:15:36Z' })
-  @Prop()
-  updated?: string;
   @ApiPropertyOptional({
     description: 'URL to background image',
     example: 'https://media.rawg.io/media/games/456/456dea5e1c7e3cd07060c14e96612001.jpg',
@@ -76,60 +69,9 @@ export class Game extends Document {
   @Prop()
   background_image_additional?: string;
 
-  @ApiPropertyOptional({ description: 'Game rating (0-5)', example: 4.48 })
-  @Prop()
-  rating?: number;
-
-  @ApiPropertyOptional({ description: 'Maximum rating value', example: 5 })
-  @Prop()
-  rating_top?: number;
-
-  @ApiPropertyOptional({ description: 'Game ratings details', type: [RatingType] })
-  @Prop({ type: [RatingType], default: [] })
-  ratings?: RatingType[];
-
-  @ApiPropertyOptional({ description: 'Number of users who added this game', example: 19260 })
-  @Prop()
-  added?: number;
-
-  @ApiPropertyOptional({
-    description: 'Status breakdown of users who added this game',
-    type: 'object',
-  })
-  @Prop({ type: Object })
-  added_by_status?: Record<string, number>;
-
   @ApiPropertyOptional({ description: 'Average playtime in hours', example: 73 })
   @Prop()
   playtime?: number;
-
-  @ApiPropertyOptional({ description: 'Number of screenshots', example: 18 })
-  @Prop()
-  screenshots_count?: number;
-
-  @ApiPropertyOptional({ description: 'Number of movies/trailers', example: 2 })
-  @Prop()
-  movies_count?: number;
-
-  @ApiPropertyOptional({ description: 'Number of creators', example: 11 })
-  @Prop()
-  creators_count?: number;
-
-  @ApiPropertyOptional({ description: 'Number of achievements', example: 539 })
-  @Prop()
-  achievements_count?: number;
-
-  @ApiPropertyOptional({ description: 'Number of parent achievements', example: 75 })
-  @Prop()
-  parent_achievements_count?: number;
-
-  @ApiPropertyOptional({ description: 'Number of game suggestions', example: 590 })
-  @Prop()
-  suggestions_count?: number;
-
-  @ApiPropertyOptional({ description: 'Number of ratings', example: 5681 })
-  @Prop()
-  ratings_count?: number;
 
   @ApiPropertyOptional({
     description: 'Alternative game names',
@@ -138,10 +80,6 @@ export class Game extends Document {
   })
   @Prop()
   alternative_names?: string[];
-
-  @ApiPropertyOptional({ description: 'Number of reviews', example: 107 })
-  @Prop()
-  reviews_count?: number;
 
   @ApiPropertyOptional({ description: 'Game publishers', type: [EntityBase] })
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'EntityBase' }], default: [] })
@@ -188,11 +126,30 @@ export class Game extends Document {
   @ApiPropertyOptional({ description: 'Game screenshots', type: [Screenshot] })
   @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Screenshot' }], default: [] })
   screenshots?: string[] | Screenshot[] | null;
+
+  @ApiPropertyOptional({ description: 'Game creators', type: [EntityBase] })
+  @Prop({ type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'EntityBase' }], default: [] })
+  creators?: string[] | EntityBase[] | null;
+
+  @ApiPropertyOptional({
+    description: 'Game website',
+    example: 'https://www.rockstargames.com/gta-v',
+  })
+  @Prop()
+  website?: string;
 }
 
 export const GameSchema = SchemaFactory.createForClass(Game);
 
 export type GameDocument = Game & Document;
+export type GameModel = Model<GameDocument>;
 
 GameSchema.index({ id: 1 });
 GameSchema.index({ slug: 1 });
+
+GameSchema.index({ tags: 1 });
+GameSchema.index({ genres: 1 });
+GameSchema.index({ publishers: 1 });
+GameSchema.index({ developers: 1 });
+GameSchema.index({ creators: 1 });
+GameSchema.index({ esrb_rating: 1 });
