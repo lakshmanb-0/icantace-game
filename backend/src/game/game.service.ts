@@ -57,6 +57,40 @@ export class GameService {
       .populate('tags');
   }
 
+  async findAll(
+    page: number = 1,
+    limit: number = 20,
+    search?: string,
+  ): Promise<{ games: GameDocument[]; total: number; page: number; totalPages: number }> {
+    const skip = (page - 1) * limit;
+
+    const filter: any = {};
+    if (search) {
+      filter.name = { $regex: search, $options: 'i' };
+    }
+
+    const [games, total] = await Promise.all([
+      this.gameModel
+        .find(filter)
+        .populate('publishers', 'name slug')
+        .populate('developers', 'name slug')
+        .populate('genres', 'name slug')
+        .populate('esrb_rating', 'name')
+        .sort({ released: -1, name: 1 })
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      this.gameModel.countDocuments(filter),
+    ]);
+
+    return {
+      games,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
+    };
+  }
+
   async upsertGames(): Promise<any> {
     const response = await this.rawgService.getGames(1, 1);
 
