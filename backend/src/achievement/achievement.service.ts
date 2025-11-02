@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { ClientSession, Connection, Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { ClientSession, Model } from 'mongoose';
 import { Achievement, AchievementDocument } from './achievement.schema';
 
 @Injectable()
 export class AchievementService {
   constructor(
     @InjectModel(Achievement.name) private readonly achievementModel: Model<AchievementDocument>,
-    @InjectConnection() private readonly connection: Connection,
   ) {}
 
   async upsertMany(achievements: any[], session: ClientSession): Promise<any> {

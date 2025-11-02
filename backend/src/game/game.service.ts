@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
+import { groupBy, uniqBy } from 'lodash';
+import { ClientSession, Connection, Model } from 'mongoose';
+import { AchievementService } from 'src/achievement/achievement.service';
+import { EntityBaseService } from 'src/entity-base/entity-base.service';
+import { SchemaType } from 'src/enum';
+import { RawgService } from 'src/rawg/rawg.service';
+import { ScreenshotService } from 'src/screenshot/screenshot.service';
+import { TrailerService } from 'src/trailer/trailer.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { Game, GameDocument } from './schema/game.schema';
-import { ClientSession, Connection, Model } from 'mongoose';
-import { groupBy, uniqBy } from 'lodash';
-import { SchemaType } from 'src/enum';
-import { EntityBaseService } from 'src/entity-base/entity-base.service';
-import { RawgService } from 'src/rawg/rawg.service';
-import { TrailerService } from 'src/trailer/trailer.service';
-import { AchievementService } from 'src/achievement/achievement.service';
-import { ScreenshotService } from 'src/screenshot/screenshot.service';
 
 @Injectable()
 export class GameService {

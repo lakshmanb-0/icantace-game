@@ -1,14 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { ClientSession, Connection, Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { ClientSession, Model } from 'mongoose';
 import { Trailer, TrailerDocument } from './trailer.schema';
 
 @Injectable()
 export class TrailerService {
-  constructor(
-    @InjectModel(Trailer.name) private readonly trailerModel: Model<TrailerDocument>,
-    @InjectConnection() private readonly connection: Connection,
-  ) {}
+  constructor(@InjectModel(Trailer.name) private readonly trailerModel: Model<TrailerDocument>) {}
 
   async upsertMany(trailers: any[], session: ClientSession): Promise<any> {
     await this.trailerModel.bulkWrite(

@@ -1,6 +1,7 @@
-import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import { SchemaType } from 'src/enum';
 
-export class GetTagsGamesPayload {
+export class GetEntityBaseGamesPayload {
   @IsString()
   @IsNotEmpty()
   slug: string;
@@ -12,18 +13,12 @@ export class GetTagsGamesPayload {
   @IsNumber()
   @IsNotEmpty()
   limit: number;
-}
 
-export class GetGenresGamesPayload {
+  @IsEnum(SchemaType)
+  @IsNotEmpty()
+  entityType: SchemaType;
+
   @IsString()
-  @IsNotEmpty()
-  slug: string;
-
-  @IsNumber()
-  @IsNotEmpty()
-  page: number;
-
-  @IsNumber()
-  @IsNotEmpty()
-  limit: number;
+  @IsOptional()
+  search: string;
 }

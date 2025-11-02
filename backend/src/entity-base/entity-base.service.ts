@@ -1,16 +1,15 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { ClientSession, Connection, Model } from 'mongoose';
-import { EntityBase, EntityBaseDocument } from './entity-base.schema';
+import { InjectModel } from '@nestjs/mongoose';
+import { ClientSession, FilterQuery, Model } from 'mongoose';
+import { EntityType, SchemaType } from 'src/enum';
 import { Game, GameDocument } from 'src/game/schema/game.schema';
-import { SchemaType } from 'src/enum';
-import { GetGenresGamesPayload, GetTagsGamesPayload } from './entity-base.dto';
+import { GetEntityBaseGamesPayload } from './entity-base.dto';
+import { EntityBase, EntityBaseDocument } from './entity-base.schema';
 
 @Injectable()
 export class EntityBaseService {
   constructor(
     @InjectModel(EntityBase.name) private readonly entityBaseModel: Model<EntityBaseDocument>,
-    @InjectConnection() private readonly connection: Connection,
     @InjectModel(Game.name) private readonly gameModel: Model<GameDocument>,
   ) {}
 
@@ -42,38 +41,26 @@ export class EntityBaseService {
     return updatedDocs;
   }
 
-  async getTagsGames(payload: GetTagsGamesPayload): Promise<any> {
-    const { slug, page, limit } = payload;
-    const tag = await this.entityBaseModel.findOne({ slug: slug, type: SchemaType.TAG });
-    if (!tag) {
-      throw new NotFoundException('Tag not found');
+  async getEntityBaseGames(payload: GetEntityBaseGamesPayload): Promise<any> {
+    const { slug, page, limit, search, entityType } = payload;
+    const entity = await this.entityBaseModel.findOne({ slug: slug, type: entityType });
+    if (!entity) {
+      throw new NotFoundException('Entity not found');
     }
-    const total = await this.gameModel.countDocuments({ tags: { $in: [tag._id] } });
+    const schemaType = EntityType[entityType as SchemaType];
+
+    const query: FilterQuery<GameDocument> = {
+      [schemaType]: { $in: [entity._id] },
+    };
+    if (search) {
+      query.name = { $regex: search, $options: 'i' };
+    }
+
     const games = await this.gameModel
-      .find({ tags: { $in: [tag._id] } })
+      .find(query)
       .skip((page - 1) * limit)
       .limit(limit);
-
-    return {
-      total,
-      games,
-    };
-  }
-
-  async getGenresGames(payload: GetGenresGamesPayload): Promise<any> {
-    const { slug, page, limit } = payload;
-    const genre = await this.entityBaseModel.findOne({ slug: slug, type: SchemaType.GENRE });
-    if (!genre) {
-      throw new NotFoundException('Genre not found');
-    }
-    const total = await this.gameModel.countDocuments({ genres: { $in: [genre._id] } });
-    const games = await this.gameModel
-      .find({ genres: { $in: [genre._id] } })
-      .skip((page - 1) * limit)
-      .limit(limit);
-    return {
-      total,
-      games,
-    };
+    const total = await this.gameModel.countDocuments(query);
+    return { total, games };
   }
 }

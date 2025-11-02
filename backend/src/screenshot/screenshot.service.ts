@@ -1,13 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { InjectConnection, InjectModel } from '@nestjs/mongoose';
-import { ClientSession, Connection, Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { ClientSession, Model } from 'mongoose';
 import { Screenshot, ScreenshotDocument } from './screenshot.schema';
 
 @Injectable()
 export class ScreenshotService {
   constructor(
     @InjectModel(Screenshot.name) private readonly screenshotModel: Model<ScreenshotDocument>,
-    @InjectConnection() private readonly connection: Connection,
   ) {}
 
   async upsertMany(screenshots: any[], session: ClientSession): Promise<any> {
