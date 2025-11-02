@@ -1,11 +1,14 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { RawgModule } from './rawg/rawg.module';
-import { GameModule } from './game/game.module';
 import { EntityBaseModule } from './entity-base/entity-base.module';
+import { GameModule } from './game/game.module';
+import { RawgModule } from './rawg/rawg.module';
+import { ReviewModule } from './review/review.module';
+import { UserGameListModule } from './user-game-list/user-game-list.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -16,6 +19,9 @@ import { EntityBaseModule } from './entity-base/entity-base.module';
     RawgModule,
     GameModule,
     EntityBaseModule,
+    UserModule,
+    ReviewModule,
+    UserGameListModule,
   ],
   controllers: [AppController],
   providers: [AppService],

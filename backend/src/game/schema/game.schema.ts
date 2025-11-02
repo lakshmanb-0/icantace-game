@@ -1,25 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document, Model } from 'mongoose';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import mongoose, { Document, Model } from 'mongoose';
 import { Achievement } from 'src/achievement/achievement.schema';
 import { EntityBase } from 'src/entity-base/entity-base.schema';
 import { Screenshot } from 'src/screenshot/screenshot.schema';
 import { Trailer } from 'src/trailer/trailer.schema';
-
-@Schema({ _id: false })
-export class RatingType {
-  @ApiProperty({ description: 'Rating title', example: 'exceptional' })
-  @Prop()
-  title: string;
-
-  @ApiProperty({ description: 'Number of ratings', example: 3056 })
-  @Prop()
-  count: number;
-
-  @ApiProperty({ description: 'Percentage of ratings', example: 53.79 })
-  @Prop()
-  percent: number;
-}
 
 // Main Game Schema
 @Schema({ timestamps: true })
@@ -146,7 +131,6 @@ export type GameModel = Model<GameDocument>;
 
 GameSchema.index({ id: 1 });
 GameSchema.index({ slug: 1 });
-
 GameSchema.index({ tags: 1 });
 GameSchema.index({ genres: 1 });
 GameSchema.index({ publishers: 1 });

@@ -8,6 +8,12 @@ export enum SchemaType {
   CREATOR = 'creator',
 }
 
+export enum UserGameListType {
+  FAVORITE = 'favorite',
+  WANT_TO_PLAY = 'want_to_play',
+  VIEWED = 'viewed',
+}
+
 export const EntityType: Record<SchemaType, string> = {
   [SchemaType.TAG]: 'tags',
   [SchemaType.GENRE]: 'genres',
